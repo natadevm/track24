@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://track24.onrender.com'
+  ? 'https://track24.onrender.com/api'
   : '/api';
 
 const api = axios.create({
