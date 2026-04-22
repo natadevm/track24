@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Plus, Edit2, Trash2, X, Check, Filter, Calendar, Wallet } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Check, Filter, ArrowUp, ArrowDown, Search, Zap, Clock, Hash, Database } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 
 const Transactions = () => {
@@ -10,23 +10,13 @@ const Transactions = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({
-    category: '',
-    type: '',
-    startDate: '',
-    endDate: ''
-  });
+  const [filters, setFilters] = useState({ category: '', type: '', startDate: '', endDate: '' });
   const [formData, setFormData] = useState({
-    amount: '',
-    type: 'expense',
-    categoryId: '',
-    description: '',
+    amount: '', type: 'expense', categoryId: '', description: '',
     date: new Date().toISOString().split('T')[0]
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [filters]);
+  useEffect(() => { fetchData(); }, [filters]);
 
   const fetchData = async () => {
     try {
@@ -51,7 +41,6 @@ const Transactions = () => {
       } else {
         await api.post('/transactions', formData);
       }
-      
       resetForm();
       fetchData();
     } catch (error) {
@@ -62,8 +51,7 @@ const Transactions = () => {
   const handleEdit = (transaction) => {
     setEditingTransaction(transaction);
     setFormData({
-      amount: transaction.amount,
-      type: transaction.type,
+      amount: transaction.amount, type: transaction.type,
       categoryId: transaction.categoryId._id,
       description: transaction.description || '',
       date: new Date(transaction.date).toISOString().split('T')[0]
@@ -71,43 +59,26 @@ const Transactions = () => {
     setShowAddForm(true);
   };
 
-  const handleDelete = async (transactionId) => {
-    if (window.confirm('Are you sure you want to delete this transaction?')) {
-      try {
-        await api.delete(`/transactions/${transactionId}`);
-        fetchData();
-      } catch (error) {
-        console.error('Error deleting transaction:', error);
-      }
+  const handleDelete = async (id) => {
+    if (window.confirm('Purge this matrix entry?')) {
+      try { await api.delete(`/transactions/${id}`); fetchData(); }
+      catch (error) { console.error('Error:', error); }
     }
   };
 
   const resetForm = () => {
-    setFormData({
-      amount: '',
-      type: 'expense',
-      categoryId: '',
-      description: '',
-      date: new Date().toISOString().split('T')[0]
-    });
+    setFormData({ amount: '', type: 'expense', categoryId: '', description: '', date: new Date().toISOString().split('T')[0] });
     setShowAddForm(false);
     setEditingTransaction(null);
   };
 
-  const resetFilters = () => {
-    setFilters({
-      category: '',
-      type: '',
-      startDate: '',
-      endDate: ''
-    });
-  };
-
+  const resetFilters = () => setFilters({ category: '', type: '', startDate: '', endDate: '' });
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex flex-col justify-center items-center h-[60vh]">
+        <div className="h-14 w-14 border-4 border-brand/20 border-t-brand rounded-full animate-spin"></div>
+        <p className="mt-6 text-white/30 text-xs font-semibold uppercase tracking-[0.3em]">Scanning Ledger Matrix...</p>
       </div>
     );
   }
@@ -115,289 +86,198 @@ const Transactions = () => {
   const filteredCategories = categories.filter(cat => cat.type === formData.type);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
-        <div className="flex space-x-3">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <Filter className="h-4 w-4 mr-2" />
-            Filters
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Database className="h-4 w-4 text-brand" />
+            <span className="text-[10px] font-bold text-brand uppercase tracking-[0.3em]">Financial Ledger</span>
+          </div>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">Transactions</h1>
+          <p className="text-white/30 text-sm mt-1">{transactions.length} matrix entries detected</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button onClick={() => setShowFilters(!showFilters)}
+            className={`btn-outline ${showFilters ? '!border-brand !text-brand' : ''}`}>
+            <Filter className="h-4 w-4 mr-2 inline" />
+            Scan Filter
           </button>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Transaction
+          <button onClick={() => setShowAddForm(true)} className="btn-blue">
+            <Plus className="h-4 w-4 mr-2 inline" />
+            New Entry
           </button>
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters Panel */}
       {showFilters && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter Transactions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="card card-glow p-6 animate-fade-in">
+          <div className="flex items-center gap-2 mb-4">
+            <Zap className="h-3.5 w-3.5 text-brand" />
+            <span className="text-xs font-bold text-white/50 uppercase tracking-wider">Diagnostic Parameters</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label htmlFor="filterType" className="block text-sm font-medium text-gray-700">
-                Type
-              </label>
-              <select
-                id="filterType"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                value={filters.type}
-                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-              >
-                <option value="">All</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
+              <label className="label">Vector Type</label>
+              <select className="input" value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}>
+                <option value="">All Vectors</option>
+                <option value="income">Inflow</option>
+                <option value="expense">Outflow</option>
               </select>
             </div>
             <div>
-              <label htmlFor="filterCategory" className="block text-sm font-medium text-gray-700">
-                Category
-              </label>
-              <select
-                id="filterCategory"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                value={filters.category}
-                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-              >
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name} ({category.type})
-                  </option>
-                ))}
+              <label className="label">Sector</label>
+              <select className="input" value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
+                <option value="">All Sectors</option>
+                {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
               </select>
             </div>
             <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-                Start Date
-              </label>
-              <input
-                type="date"
-                id="startDate"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                value={filters.startDate}
-                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-              />
+              <label className="label">Timeline Start</label>
+              <input type="date" className="input" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })} />
             </div>
             <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-                End Date
-              </label>
-              <input
-                type="date"
-                id="endDate"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                value={filters.endDate}
-                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-              />
+              <label className="label">Timeline End</label>
+              <input type="date" className="input" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })} />
             </div>
           </div>
-          <div className="mt-4 flex space-x-3">
-            <button
-              onClick={resetFilters}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Reset Filters
+          <div className="mt-4 flex justify-end">
+            <button onClick={resetFilters} className="text-xs text-white/40 hover:text-brand font-semibold transition-colors uppercase tracking-wider">
+              Reset Parameters
             </button>
           </div>
         </div>
       )}
 
-      {/* Add/Edit Form */}
+      {/* Transaction List */}
+      <div className="space-y-3 stagger">
+        {transactions.length > 0 ? (
+          transactions.map((t) => (
+            <div key={t._id} className="card card-hover p-5 group flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+              {/* Left accent */}
+              <div className={`absolute left-0 top-0 bottom-0 w-1 ${t.type === 'income' ? 'bg-success' : 'bg-brand'}`}></div>
+
+              <div className="flex items-center space-x-4 pl-2">
+                <div className={`p-3 rounded-xl border transition-transform duration-300 group-hover:scale-110 ${
+                  t.type === 'income'
+                    ? 'bg-success/10 border-success/20 text-success'
+                    : 'bg-brand/10 border-brand/20 text-brand'
+                }`}>
+                  {t.type === 'income' ? <ArrowUp className="h-5 w-5" /> : <ArrowDown className="h-5 w-5" />}
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm">{t.description || 'Unnamed Vector'}</p>
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    <span className="tag bg-brand/10 text-brand border border-brand/20">{t.categoryId.name}</span>
+                    <span className="flex items-center text-[10px] text-white/30 font-medium">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {new Date(t.date).toLocaleDateString()}
+                    </span>
+                    <span className="hidden sm:flex items-center text-[10px] text-white/20 font-mono">
+                      <Hash className="h-3 w-3 mr-0.5" />
+                      {t._id.substring(0, 8)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between sm:justify-end gap-4 pl-2 sm:pl-0">
+                <p className={`text-xl font-extrabold tabular-nums ${t.type === 'income' ? 'text-success' : 'text-white'}`}>
+                  {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                </p>
+                <div className="flex items-center gap-1.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => handleEdit(t)} className="p-2 rounded-lg bg-white/5 hover:bg-brand/20 text-white/50 hover:text-brand transition-all">
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button onClick={() => handleDelete(t._id)} className="p-2 rounded-lg bg-white/5 hover:bg-danger/20 text-white/50 hover:text-danger transition-all">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="card p-16 text-center animate-fade-in">
+            <div className="animate-float">
+              <Search className="h-12 w-12 text-white/15 mx-auto mb-4" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Null Archive</h3>
+            <p className="text-white/30 text-sm">No matrix entries detected. Initialize your first transaction vector.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Add/Edit Modal */}
       {showAddForm && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}
-          </h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70" onClick={resetForm} />
+          <div className="card card-glow w-full max-w-xl p-8 z-10 animate-scale-in relative">
+            {/* Top glow line */}
+            <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-brand to-transparent opacity-60"></div>
+
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-                  Amount
-                </label>
-                <input
-                  type="number"
-                  id="amount"
-                  step="0.01"
-                  min="0"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                />
+                <h3 className="text-2xl font-extrabold text-white">
+                  {editingTransaction ? 'Override Matrix Entry' : 'Register New Vector'}
+                </h3>
+                <p className="text-xs text-white/30 mt-1 uppercase tracking-wider font-medium">
+                  {editingTransaction ? 'Modify existing data point' : 'Initialize transaction protocol'}
+                </p>
               </div>
-              <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                  Type
-                </label>
-                <select
-                  id="type"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value, categoryId: '' })}
-                >
-                  <option value="income">Income</option>
-                  <option value="expense">Expense</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
-                  Category
-                </label>
-                <select
-                  id="categoryId"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.categoryId}
-                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                >
-                  <option value="">Select a category</option>
-                  {filteredCategories.map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description (Optional)
-              </label>
-              <textarea
-                id="description"
-                rows={3}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
-            </div>
-            <div className="flex space-x-3">
-              <button
-                type="submit"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <Check className="h-4 w-4 mr-2" />
-                {editingTransaction ? 'Update' : 'Add'}
-              </button>
-              <button
-                type="button"
-                onClick={resetForm}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Cancel
+              <button onClick={resetForm} className="p-2 text-white/30 hover:text-white rounded-lg hover:bg-white/5 transition-all">
+                <X className="h-5 w-5" />
               </button>
             </div>
-          </form>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="label">Magnitude (Amount)</label>
+                  <input type="number" step="0.01" required className="input text-lg font-bold" placeholder="0.00"
+                    value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} />
+                </div>
+                <div>
+                  <label className="label">Vector Class</label>
+                  <div className="flex bg-surface rounded-xl border border-white/10 p-1">
+                    <button type="button" onClick={() => setFormData({ ...formData, type: 'expense', categoryId: '' })}
+                      className={`flex-1 py-3 text-sm font-semibold rounded-lg transition-all ${formData.type === 'expense' ? 'bg-brand text-white shadow-[0_2px_10px_rgba(59,130,246,0.3)]' : 'text-white/40 hover:text-white'}`}>
+                      Outflow
+                    </button>
+                    <button type="button" onClick={() => setFormData({ ...formData, type: 'income', categoryId: '' })}
+                      className={`flex-1 py-3 text-sm font-semibold rounded-lg transition-all ${formData.type === 'income' ? 'bg-success text-white shadow-[0_2px_10px_rgba(16,185,129,0.3)]' : 'text-white/40 hover:text-white'}`}>
+                      Inflow
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="label">Sector Index</label>
+                  <select required className="input" value={formData.categoryId} onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}>
+                    <option value="">Select sector...</option>
+                    {filteredCategories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="label">Timeline Lock</label>
+                  <input type="date" required className="input" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <label className="label">Identification Tag</label>
+                <textarea rows={2} className="input" placeholder="Describe this vector..."
+                  value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+              </div>
+              <div className="flex gap-3 pt-4 border-t border-white/5">
+                <button type="submit" className="btn-blue flex-1">
+                  <Check className="h-4 w-4 mr-2 inline" />
+                  {editingTransaction ? 'Execute Override' : 'Commit Protocol'}
+                </button>
+                <button type="button" onClick={resetForm} className="btn-outline flex-1">Abort</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
-
-      {/* Transactions List */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Transaction History ({transactions.length})
-          </h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {transactions.length > 0 ? (
-                transactions.map((transaction) => (
-                  <tr key={transaction._id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(transaction.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {transaction.description || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {transaction.categoryId.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        transaction.type === 'income'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {transaction.type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <span className={transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}>
-                        {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleEdit(transaction)}
-                        className="text-blue-600 hover:text-blue-900 mr-3"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(transaction._id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                    No transactions found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 };
