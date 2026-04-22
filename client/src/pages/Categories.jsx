@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Plus, Edit2, Trash2, X, Check } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Check, PieChart } from 'lucide-react';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -150,11 +150,14 @@ const Categories = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* Income Categories */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-green-600">Income Categories</h2>
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
+            <div className="flex items-center">
+              <PieChart className="h-5 w-5 text-white mr-2" />
+              <h2 className="text-lg font-bold text-white">Income Categories</h2>
+            </div>
           </div>
           <div className="p-6">
             {incomeCategories.length > 0 ? (
@@ -162,24 +165,27 @@ const Categories = () => {
                 {incomeCategories.map((category) => (
                   <div
                     key={category._id}
-                    className="flex items-center justify-between p-3 bg-green-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-shadow duration-200"
                   >
-                    <div>
-                      <h3 className="font-medium text-gray-900">{category.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        Created: {new Date(category.createdAt).toLocaleDateString()}
-                      </p>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                        <p className="text-sm text-gray-600">
+                          Created: {new Date(category.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleEdit(category)}
-                        className="p-2 text-blue-600 hover:text-blue-800"
+                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors duration-200"
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(category._id)}
-                        className="p-2 text-red-600 hover:text-red-800"
+                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -188,15 +194,22 @@ const Categories = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">No income categories found</p>
+              <div className="text-center py-8 bg-green-50 rounded-lg border border-green-200">
+                <PieChart className="h-12 w-12 text-green-300 mx-auto mb-2" />
+                <p className="text-green-700 font-medium">No income categories found</p>
+                <p className="text-green-600 text-sm mt-1">Add your first income category to get started</p>
+              </div>
             )}
           </div>
         </div>
 
         {/* Expense Categories */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-red-600">Expense Categories</h2>
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4">
+            <div className="flex items-center">
+              <PieChart className="h-5 w-5 text-white mr-2" />
+              <h2 className="text-lg font-bold text-white">Expense Categories</h2>
+            </div>
           </div>
           <div className="p-6">
             {expenseCategories.length > 0 ? (
@@ -204,24 +217,27 @@ const Categories = () => {
                 {expenseCategories.map((category) => (
                   <div
                     key={category._id}
-                    className="flex items-center justify-between p-3 bg-red-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg hover:shadow-md transition-shadow duration-200"
                   >
-                    <div>
-                      <h3 className="font-medium text-gray-900">{category.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        Created: {new Date(category.createdAt).toLocaleDateString()}
-                      </p>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                        <p className="text-sm text-gray-600">
+                          Created: {new Date(category.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleEdit(category)}
-                        className="p-2 text-blue-600 hover:text-blue-800"
+                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors duration-200"
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(category._id)}
-                        className="p-2 text-red-600 hover:text-red-800"
+                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -230,7 +246,11 @@ const Categories = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">No expense categories found</p>
+              <div className="text-center py-8 bg-red-50 rounded-lg border border-red-200">
+                <PieChart className="h-12 w-12 text-red-300 mx-auto mb-2" />
+                <p className="text-red-700 font-medium">No expense categories found</p>
+                <p className="text-red-600 text-sm mt-1">Add your first expense category to get started</p>
+              </div>
             )}
           </div>
         </div>

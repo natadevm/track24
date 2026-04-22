@@ -15,7 +15,8 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { DollarSign, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, CreditCard } from 'lucide-react';
+import { formatCurrency, formatCurrencySimple } from '../utils/currency';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -52,12 +53,6 @@ const Dashboard = () => {
     );
   }
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
@@ -100,73 +95,84 @@ const Dashboard = () => {
       <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
       
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <TrendingUp className="h-8 w-8 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Income</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {formatCurrency(stats.totalIncome)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <TrendingDown className="h-8 w-8 text-red-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Expense</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {formatCurrency(stats.totalExpense)}
-              </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-green-500 rounded-lg p-3">
+                <TrendingUp className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-green-800">Total Income</p>
+                <p className="text-xl lg:text-2xl font-bold text-green-900">
+                  {formatCurrency(stats.totalIncome)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Wallet className="h-8 w-8 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Balance</p>
-              <p className={`text-2xl font-semibold ${
-                stats.balance >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {formatCurrency(stats.balance)}
-              </p>
+        <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-red-500 rounded-lg p-3">
+                <TrendingDown className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-red-800">Total Expense</p>
+                <p className="text-xl lg:text-2xl font-bold text-red-900">
+                  {formatCurrency(stats.totalExpense)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <DollarSign className="h-8 w-8 text-purple-600" />
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-blue-500 rounded-lg p-3">
+                <Wallet className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-blue-800">Balance</p>
+                <p className={`text-xl lg:text-2xl font-bold ${
+                  stats.balance >= 0 ? 'text-green-900' : 'text-red-900'
+                }`}>
+                  {formatCurrency(stats.balance)}
+                </p>
+              </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Net Change</p>
-              <p className={`text-2xl font-semibold ${
-                stats.balance >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {stats.balance >= 0 ? '+' : ''}{formatCurrency(stats.balance)}
-              </p>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-purple-500 rounded-lg p-3">
+                <CreditCard className="h-6 w-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-purple-800">Net Change</p>
+                <p className={`text-xl lg:text-2xl font-bold ${
+                  stats.balance >= 0 ? 'text-green-900' : 'text-red-900'
+                }`}>
+                  {stats.balance >= 0 ? '+' : ''}{formatCurrency(stats.balance)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* Expense Breakdown */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Expense Breakdown</h2>
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center mb-4">
+            <div className="w-2 h-8 bg-red-500 rounded-full mr-3"></div>
+            <h2 className="text-lg font-bold text-gray-900">Expense Breakdown</h2>
+          </div>
           {expenseChartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -188,15 +194,19 @@ const Dashboard = () => {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="text-center text-gray-500 py-8">
-              No expense data available
+            <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+              <TrendingDown className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+              <p>No expense data available</p>
             </div>
           )}
         </div>
 
         {/* Income Breakdown */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Income Breakdown</h2>
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center mb-4">
+            <div className="w-2 h-8 bg-green-500 rounded-full mr-3"></div>
+            <h2 className="text-lg font-bold text-gray-900">Income Breakdown</h2>
+          </div>
           {incomeChartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -218,58 +228,75 @@ const Dashboard = () => {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="text-center text-gray-500 py-8">
-              No income data available
+            <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+              <TrendingUp className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+              <p>No income data available</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Monthly Comparison */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Monthly Income vs Expense</h2>
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div className="flex items-center mb-4">
+          <div className="w-2 h-8 bg-blue-500 rounded-full mr-3"></div>
+          <h2 className="text-lg font-bold text-gray-900">Monthly Income vs Expense</h2>
+        </div>
         {monthlyData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis tickFormatter={(value) => `$${value}`} />
-              <Tooltip formatter={(value) => formatCurrency(value)} />
-              <Legend />
-              <Bar dataKey="income" fill="#10B981" name="Income" />
-              <Bar dataKey="expense" fill="#EF4444" name="Expense" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="month" tick={{ fill: '#6b7280' }} />
+              <YAxis tickFormatter={(value) => `ETB ${value.toLocaleString()}`} tick={{ fill: '#6b7280' }} />
+              <Tooltip 
+                formatter={(value) => formatCurrency(value)} 
+                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+              />
+              <Legend wrapperStyle={{ paddingTop: '20px' }} />
+              <Bar dataKey="income" fill="#10B981" name="Income" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="expense" fill="#EF4444" name="Expense" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="text-center text-gray-500 py-8">
-            No monthly data available
+          <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+            <Wallet className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+            <p>No monthly data available</p>
           </div>
         )}
       </div>
 
       {/* Balance Trend */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Balance Trend</h2>
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div className="flex items-center mb-4">
+          <div className="w-2 h-8 bg-purple-500 rounded-full mr-3"></div>
+          <h2 className="text-lg font-bold text-gray-900">Balance Trend</h2>
+        </div>
         {balanceTrendData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={balanceTrendData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis tickFormatter={(value) => `$${value}`} />
-              <Tooltip formatter={(value) => formatCurrency(value)} />
-              <Legend />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="month" tick={{ fill: '#6b7280' }} />
+              <YAxis tickFormatter={(value) => `ETB ${value.toLocaleString()}`} tick={{ fill: '#6b7280' }} />
+              <Tooltip 
+                formatter={(value) => formatCurrency(value)} 
+                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+              />
+              <Legend wrapperStyle={{ paddingTop: '20px' }} />
               <Line 
                 type="monotone" 
                 dataKey="balance" 
                 stroke="#3B82F6" 
-                strokeWidth={2}
+                strokeWidth={3}
+                dot={{ fill: '#3B82F6', strokeWidth: 2, r: 6 }}
+                activeDot={{ r: 8 }}
                 name="Balance"
               />
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="text-center text-gray-500 py-8">
-            No balance trend data available
+          <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+            <CreditCard className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+            <p>No balance trend data available</p>
           </div>
         )}
       </div>

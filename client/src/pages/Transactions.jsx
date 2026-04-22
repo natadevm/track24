@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Plus, Edit2, Trash2, X, Check, Filter, Calendar, DollarSign } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Check, Filter, Calendar, Wallet } from 'lucide-react';
+import { formatCurrency } from '../utils/currency';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -102,12 +103,6 @@ const Transactions = () => {
     });
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
 
   if (loading) {
     return (
