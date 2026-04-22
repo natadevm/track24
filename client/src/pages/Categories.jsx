@@ -18,7 +18,7 @@ const Categories = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get('/api/categories');
+      const res = await api.get('/categories');
       setCategories(res.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -31,9 +31,9 @@ const Categories = () => {
     e.preventDefault();
     try {
       if (editingCategory) {
-        await axios.put(`/api/categories/${editingCategory._id}`, formData);
+        await api.put(`/categories/${editingCategory._id}`, formData);
       } else {
-        await axios.post('/api/categories', formData);
+        await api.post('/categories', formData);
       }
       
       setFormData({ name: '', type: 'expense' });
@@ -57,7 +57,7 @@ const Categories = () => {
   const handleDelete = async (categoryId) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
-        await axios.delete(`/api/categories/${categoryId}`);
+        await api.delete(`/categories/${categoryId}`);
         fetchCategories();
       } catch (error) {
         console.error('Error deleting category:', error);

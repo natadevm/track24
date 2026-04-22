@@ -30,8 +30,8 @@ const Transactions = () => {
   const fetchData = async () => {
     try {
       const [transactionsRes, categoriesRes] = await Promise.all([
-        axios.get('/api/transactions', { params: filters }),
-        axios.get('/api/categories')
+        api.get('/transactions', { params: filters }),
+        api.get('/categories')
       ]);
       setTransactions(transactionsRes.data);
       setCategories(categoriesRes.data);
@@ -46,9 +46,9 @@ const Transactions = () => {
     e.preventDefault();
     try {
       if (editingTransaction) {
-        await axios.put(`/api/transactions/${editingTransaction._id}`, formData);
+        await api.put(`/transactions/${editingTransaction._id}`, formData);
       } else {
-        await axios.post('/api/transactions', formData);
+        await api.post('/transactions', formData);
       }
       
       resetForm();
@@ -73,7 +73,7 @@ const Transactions = () => {
   const handleDelete = async (transactionId) => {
     if (window.confirm('Are you sure you want to delete this transaction?')) {
       try {
-        await axios.delete(`/api/transactions/${transactionId}`);
+        await api.delete(`/transactions/${transactionId}`);
         fetchData();
       } catch (error) {
         console.error('Error deleting transaction:', error);

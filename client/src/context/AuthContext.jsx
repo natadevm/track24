@@ -64,9 +64,9 @@ export const AuthProvider = ({ children }) => {
   // Set up axios defaults
   useEffect(() => {
     if (state.token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
     } else {
-      delete axios.defaults.headers.common['Authorization'];
+      delete api.defaults.headers.common['Authorization'];
     }
   }, [state.token]);
 
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     const loadUser = async () => {
       if (state.token) {
         try {
-          const res = await axios.get('/api/auth/profile');
+          const res = await api.get('/auth/profile');
           dispatch({
             type: 'LOGIN_SUCCESS',
             payload: {
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
-      const res = await axios.post('/api/auth/login', { email, password });
+      const res = await api.post('/auth/login', { email, password });
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: res.data
@@ -121,7 +121,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, email, password) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
-      const res = await axios.post('/api/auth/register', { username, email, password });
+      const res = await api.post('/auth/register', { username, email, password });
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: res.data
